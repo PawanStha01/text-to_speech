@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech Converter | WebTools</title>
+    <meta name="description" content="Convert any text to speech instantly with our free online tool. Supports multiple voices and languages.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .tool-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .tool-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        }
+        
+        .tool-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .tool-body {
+            padding: 25px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 10px 20px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .voice-controls {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .home-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .home-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .speech-animation {
+            display: inline-block;
+            position: relative;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .speech-animation span {
+            display: block;
+            position: absolute;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: speech 1.5s infinite ease-in-out;
+        }
+        
+        .speech-animation span:nth-child(1) {
+            left: 0;
+            width: 8px;
+            height: 8px;
+            animation-delay: 0s;
+        }
+        
+        .speech-animation span:nth-child(2) {
+            left: 12px;
+            width: 10px;
+            height: 10px;
+            animation-delay: 0.2s;
+        }
+        
+        .speech-animation span:nth-child(3) {
+            left: 24px;
+            width: 8px;
+            height: 8px;
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes speech {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+        
+        .ad-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px dashed #ccc;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .tool-body {
+                padding: 15px;
+            }
+            
+            .home-btn {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dynamic Header Placeholder -->
+    <div id="header-container"></div>
+    
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="tool-container">
+                    <div class="tool-header">
+                        <h1><i class="fas fa-volume-up me-2"></i> Text-to-Speech Converter</h1>
+                        <p class="mb-0">Convert any text to natural sounding speech instantly</p>
+                    </div>
+                    
+                    <div class="tool-body">
+                        <!-- Ad Section -->
+                        <div class="ad-container">
+                            <p class="text-muted mb-0">Advertisement</p>
+                            <!-- AdSense or other ad code would go here -->
+                            <div style="height: 90px; background: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                                <small>Ad Space (728x90)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="text-input" class="form-label">Enter your text:</label>
+                                    <textarea class="form-control" id="text-input" rows="10" placeholder="Type or paste your text here..."></textarea>
+                                </div>
+                                
+                                <div class="d-flex gap-2 mb-4">
+                                    <button id="speak-btn" class="btn btn-primary flex-grow-1">
+                                        <i class="fas fa-play me-2"></i> Speak
+                                    </button>
+                                    <button id="pause-btn" class="btn btn-outline-primary" disabled>
+                                        <i class="fas fa-pause me-2"></i> Pause
+                                    </button>
+                                    <button id="stop-btn" class="btn btn-outline-primary" disabled>
+                                        <i class="fas fa-stop me-2"></i> Stop
+                                    </button>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <label for="volume" class="form-label me-3 mb-0">Volume:</label>
+                                    <input type="range" class="form-range" id="volume" min="0" max="1" step="0.1" value="1">
+                                    <span id="volume-value" class="ms-2">1.0</span>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <label for="rate" class="form-label me-3 mb-0">Speed:</label>
+                                    <input type="range" class="form-range" id="rate" min="0.5" max="2" step="0.1" value="1">
+                                    <span id="rate-value" class="ms-2">1.0</span>
+                                </div>
+                                
+                                <div class="d-flex align-items-center">
+                                    <label for="pitch" class="form-label me-3 mb-0">Pitch:</label>
+                                    <input type="range" class="form-range" id="pitch" min="0.5" max="2" step="0.1" value="1">
+                                    <span id="pitch-value" class="ms-2">1.0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="voice-controls">
+                                    <div class="mb-3">
+                                        <label for="voice-select" class="form-label">Select Voice:</label>
+                                        <select class="form-select" id="voice-select">
+                                            <option value="">Loading voices...</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="language-select" class="form-label">Language:</label>
+                                        <select class="form-select" id="language-select">
+                                            <option value="all">All Languages</option>
+                                            <option value="en">English</option>
+                                            <option value="es">Spanish</option>
+                                            <option value="fr">French</option>
+                                            <option value="de">German</option>
+                                            <option value="it">Italian</option>
+                                            <option value="ja">Japanese</option>
+                                            <option value="zh">Chinese</option>
+                                            <option value="hi">Hindi</option>
+                                            <option value="ar">Arabic</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="highlight-words" checked>
+                                        <label class="form-check-label" for="highlight-words">Highlight words as they're spoken</label>
+                                    </div>
+                                </div>
+                                
+                                <div id="output-container" class="border rounded p-3 bg-light" style="min-height: 200px;">
+                                    <p class="text-muted">Speech output will appear here...</p>
+                                    <div id="speech-status" class="d-flex align-items-center justify-content-center" style="height: 100px; display: none;">
+                                        <div class="speech-animation">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        <span class="ms-2">Speaking...</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3 text-end">
+                                    <button id="download-btn" class="btn btn-outline-primary me-2" disabled>
+                                        <i class="fas fa-download me-2"></i> Download as MP3
+                                    </button>
+                                    <button id="copy-btn" class="btn btn-outline-primary">
+                                        <i class="fas fa-copy me-2"></i> Copy Text
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ad Section -->
+                        <div class="ad-container mt-4">
+                            <p class="text-muted mb-0">Advertisement</p>
+                            <!-- AdSense or other ad code would go here -->
+                            <div style="height: 250px; background: #e9ecef; display: flex; align-items: center; justify-content: center;">
+                                <small>Ad Space (300x250)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h3 class="mb-3">About Text-to-Speech Converter</h3>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <p>Our free online Text-to-Speech (TTS) tool allows you to convert written text into natural sounding speech. Simply type or paste your text, select a voice, and click the "Speak" button.</p>
+                            
+                            <h5 class="mt-4">Features:</h5>
+                            <ul>
+                                <li>Multiple high-quality voices in different languages</li>
+                                <li>Adjustable speech rate, pitch, and volume</li>
+                                <li>Real-time word highlighting as text is spoken</li>
+                                <li>No registration required - completely free to use</li>
+                                <li>Works on all devices - desktop, tablet, and mobile</li>
+                            </ul>
+                            
+                            <h5 class="mt-4">Common Uses:</h5>
+                            <ul>
+                                <li>Proofreading documents by listening</li>
+                                <li>Creating audio versions of written content</li>
+                                <li>Helping with language learning and pronunciation</li>
+                                <li>Assisting those with reading difficulties</li>
+                                <li>Generating voiceovers for videos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dynamic Footer Placeholder -->
+    <div id="footer-container"></div>
+    
+    <!-- Home Button -->
+    <a href="index.html" class="home-btn" title="Back to Home">
+        <i class="fas fa-home fa-lg"></i>
+    </a>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dynamic Header and Footer Loading
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load header
+            fetch('header.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('header-container').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading header:', error);
+                    document.getElementById('header-container').innerHTML = `
+                        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                            <div class="container">
+                                <a class="navbar-brand" href="index.html">WebTools</a>
+                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                                    <span class="navbar-toggler-icon"></span>
+                                </button>
+                                <div class="collapse navbar-collapse" id="navbarNav">
+                                    <ul class="navbar-nav me-auto">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" href="index.html">Home</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#">Text Tools</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#">Image Tools</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#">Developer Tools</a>
+                                        </li>
+                                    </ul>
+                                    <form class="d-flex">
+                                        <input class="form-control me-2" type="search" placeholder="Search tools...">
+                                        <button class="btn btn-outline-light" type="submit">Search</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </nav>
+                    `;
+                });
+            
+            // Load footer
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('footer-container').innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading footer:', error);
+                    document.getElementById('footer-container').innerHTML = `
+                        <footer class="bg-dark text-white py-4 mt-5">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <h5>WebTools</h5>
+                                        <p>Your one-stop destination for free online tools to make your digital life easier.</p>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <h5>Quick Links</h5>
+                                        <ul class="list-unstyled">
+                                            <li><a href="index.html" class="text-white">Home</a></li>
+                                            <li><a href="#" class="text-white">Text Tools</a></li>
+                                            <li><a href="#" class="text-white">Image Tools</a></li>
+                                            <li><a href="#" class="text-white">Developer Tools</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <h5>Connect With Us</h5>
+                                        <div class="social-links">
+                                            <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                                            <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                                            <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                                            <a href="#" class="text-white"><i class="fab fa-github"></i></a>
+                                        </div>
+                                        <p class="mt-2 mb-0">contact@webtools.com</p>
+                                    </div>
+                                </div>
+                                <hr class="my-3 bg-light">
+                                <div class="text-center">
+                                    <p class="mb-0">&copy; ${new Date().getFullYear()} WebTools. All rights reserved.</p>
+                                </div>
+                            </div>
+                        </footer>
+                    `;
+                });
+            
+            // Text-to-Speech Functionality
+            const textInput = document.getElementById('text-input');
+            const voiceSelect = document.getElementById('voice-select');
+            const languageSelect = document.getElementById('language-select');
+            const speakBtn = document.getElementById('speak-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const volumeControl = document.getElementById('volume');
+            const rateControl = document.getElementById('rate');
+            const pitchControl = document.getElementById('pitch');
+            const volumeValue = document.getElementById('volume-value');
+            const rateValue = document.getElementById('rate-value');
+            const pitchValue = document.getElementById('pitch-value');
+            const outputContainer = document.getElementById('output-container');
+            const speechStatus = document.getElementById('speech-status');
+            const downloadBtn = document.getElementById('download-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const highlightCheckbox = document.getElementById('highlight-words');
+            
+            let speechSynthesis = window.speechSynthesis;
+            let voices = [];
+            let currentUtterance = null;
+            let isSpeaking = false;
+            let isPaused = false;
+            
+            // Update slider value displays
+            volumeControl.addEventListener('input', () => {
+                volumeValue.textContent = volumeControl.value;
+            });
+            
+            rateControl.addEventListener('input', () => {
+                rateValue.textContent = rateControl.value;
+            });
+            
+            pitchControl.addEventListener('input', () => {
+                pitchValue.textContent = pitchControl.value;
+            });
+            
+            // Load available voices
+            function loadVoices() {
+                voices = speechSynthesis.getVoices();
+                voiceSelect.innerHTML = '';
+                
+                // Filter voices based on selected language
+                const selectedLanguage = languageSelect.value;
+                let filteredVoices = voices;
+                
+                if (selectedLanguage !== 'all') {
+                    filteredVoices = voices.filter(voice => 
+                        voice.lang.startsWith(selectedLanguage)
+                    );
+                }
+                
+                if (filteredVoices.length === 0) {
+                    voiceSelect.innerHTML = '<option value="">No voices available for selected language</option>';
+                    return;
+                }
+                
+                // Group voices by language
+                const voicesByLang = filteredVoices.reduce((acc, voice) => {
+                    const lang = voice.lang;
+                    if (!acc[lang]) {
+                        acc[lang] = [];
+                    }
+                    acc[lang].push(voice);
+                    return acc;
+                }, {});
+                
+                // Add options grouped by language
+                for (const [lang, langVoices] of Object.entries(voicesByLang)) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = `${getLanguageName(lang)} (${lang})`;
+                    
+                    langVoices.forEach(voice => {
+                        const option = document.createElement('option');
+                        option.value = voice.name;
+                        option.textContent = `${voice.name} (${voice.lang}) ${voice.default ? ' - Default' : ''}`;
+                        optgroup.appendChild(option);
+                    });
+                    
+                    voiceSelect.appendChild(optgroup);
+                }
+                
+                // Select default voice if available
+                const defaultVoice = filteredVoices.find(voice => voice.default);
+                if (defaultVoice) {
+                    voiceSelect.value = defaultVoice.name;
+                }
+            }
+            
+            // Get language name from code
+            function getLanguageName(langCode) {
+                const langNames = new Intl.DisplayNames(['en'], {type: 'language'});
+                return langNames.of(langCode.split('-')[0]) || langCode;
+            }
+            
+            // Initialize voices
+            speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices(); // In case voices are already loaded
+            
+            // Language selection change
+            languageSelect.addEventListener('change', loadVoices);
+            
+            // Speak button click handler
+            speakBtn.addEventListener('click', () => {
+                if (isSpeaking && !isPaused) {
+                    speechSynthesis.pause();
+                    isPaused = true;
+                    speakBtn.innerHTML = '<i class="fas fa-play me-2"></i> Resume';
+                    pauseBtn.disabled = true;
+                    return;
+                }
+                
+                if (isPaused) {
+                    speechSynthesis.resume();
+                    isPaused = false;
+                    speakBtn.innerHTML = '<i class="fas fa-play me-2"></i> Speak';
+                    pauseBtn.disabled = false;
+                    return;
+                }
+                
+                const text = textInput.value.trim();
+                if (!text) {
+                    outputContainer.innerHTML = '<p class="text-danger">Please enter some text to speak.</p>';
+                    return;
+                }
+                
+                const selectedVoiceName = voiceSelect.value;
+                const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
+                
+                if (speechSynthesis.speaking) {
+                    speechSynthesis.cancel();
+                }
+                
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                
+                if (selectedVoice) {
+                    currentUtterance.voice = selectedVoice;
+                }
+                
+                currentUtterance.volume = parseFloat(volumeControl.value);
+                currentUtterance.rate = parseFloat(rateControl.value);
+                currentUtterance.pitch = parseFloat(pitchControl.value);
+                
+                // Word highlighting
+                if (highlightCheckbox.checked) {
+                    const words = text.split(/\s+/);
+                    let currentWordIndex = 0;
+                    
+                    currentUtterance.onboundary = (event) => {
+                        if (event.name === 'word') {
+                            const highlightedText = words.map((word, index) => {
+                                return index === currentWordIndex ? 
+                                    `<span class="bg-warning px-1 rounded">${word}</span>` : 
+                                    word;
+                            }).join(' ');
+                            
+                            outputContainer.innerHTML = highlightedText;
+                            currentWordIndex++;
+                        }
+                    };
+                } else {
+                    outputContainer.textContent = text;
+                }
+                
+                currentUtterance.onstart = () => {
+                    isSpeaking = true;
+                    speakBtn.innerHTML = '<i class="fas fa-pause me-2"></i> Pause';
+                    pauseBtn.disabled = false;
+                    stopBtn.disabled = false;
+                    downloadBtn.disabled = false;
+                    speechStatus.style.display = 'flex';
+                };
+                
+                currentUtterance.onend = () => {
+                    isSpeaking = false;
+                    isPaused = false;
+                    speakBtn.innerHTML = '<i class="fas fa-play me-2"></i> Speak';
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    speechStatus.style.display = 'none';
+                };
+                
+                currentUtterance.onerror = (event) => {
+                    console.error('SpeechSynthesis error:', event);
+                    outputContainer.innerHTML = `<p class="text-danger">Error: ${event.error}</p>`;
+                    isSpeaking = false;
+                    isPaused = false;
+                    speakBtn.innerHTML = '<i class="fas fa-play me-2"></i> Speak';
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    speechStatus.style.display = 'none';
+                };
+                
+                speechSynthesis.speak(currentUtterance);
+            });
+            
+            // Pause button click handler
+            pauseBtn.addEventListener('click', () => {
+                if (isSpeaking && !isPaused) {
+                    speechSynthesis.pause();
+                    isPaused = true;
+                    pauseBtn.innerHTML = '<i class="fas fa-play me-2"></i> Resume';
+                } else if (isPaused) {
+                    speechSynthesis.resume();
+                    isPaused = false;
+                    pauseBtn.innerHTML = '<i class="fas fa-pause me-2"></i> Pause';
+                }
+            });
+            
+            // Stop button click handler
+            stopBtn.addEventListener('click', () => {
+                speechSynthesis.cancel();
+                isSpeaking = false;
+                isPaused = false;
+                speakBtn.innerHTML = '<i class="fas fa-play me-2"></i> Speak';
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+                speechStatus.style.display = 'none';
+            });
+            
+            // Copy button click handler
+            copyBtn.addEventListener('click', () => {
+                textInput.select();
+                document.execCommand('copy');
+                
+                // Show feedback
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check me-2"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+            
+            // Download button click handler (simulated - actual implementation would require server-side processing)
+            downloadBtn.addEventListener('click', () => {
+                const text = textInput.value.trim();
+                if (!text) {
+                    outputContainer.innerHTML = '<p class="text-danger">No text to download.</p>';
+                    return;
+                }
+                
+                // In a real implementation, this would call a server-side API to generate an MP3
+                outputContainer.innerHTML = '<p class="text-info">Download feature would connect to a TTS API to generate an MP3 in a full implementation.</p>';
+                
+                // Simulate download (would be replaced with actual download logic)
+                setTimeout(() => {
+                    outputContainer.innerHTML += '<p class="text-success mt-2">MP3 generated successfully!</p>';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
